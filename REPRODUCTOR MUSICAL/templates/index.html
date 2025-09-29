@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor de música Gabo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>GABO MIX </h1>
+
+
+    <!-- Vinilo giratorio -->
+    <div class="vinilo-container">
+        <img src="{{ url_for('static', filename='vinilo.png') }}" alt="Vinilo" class="vinilo" id="vinilo">
+    </div>
+
+    <!-- Controles de audio -->
+    <audio id="audioPlayer" controls></audio>
+
+    <div class="controls">
+        <button id="prevBtn">ATRAS</button>
+        <button id="playPauseBtn">▶ / ⏸</button>
+        <button id="nextBtn"> SIGUIENTE</button>
+        <button id="backwardBtn"> -10s</button>
+        <button id="forwardBtn"> +10s</button>
+    </div>
+
+    <!-- Subida de canciones -->
+    <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file">
+    <label for="fileInput">SELECCIONAR ARCHIVO</label>
+    <button type="submit"> SUBIR</button>
+</form>
+
+
+    <!-- Playlist -->
+    <h3>Playlist</h3>
+    <ul id="playlist"></ul>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
