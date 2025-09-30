@@ -145,9 +145,13 @@ async function moveSong(filename, newPosition) {
         if (result.ok) {
             await loadPlaylist();
             return true;
+        } else {
+            console.error('Error del servidor:', result.error);
+            alert('No se pudo mover la canción: ' + (result.error || 'Error desconocido'));
         }
     } catch (error) {
         console.error('Error moviendo canción:', error);
+        alert('Error de conexión al mover la canción');
     }
     return false;
 }
@@ -202,9 +206,17 @@ function updatePlaylist() {
         upBtn.textContent = "↑";
         upBtn.classList.add("moveBtn");
         upBtn.title = "Mover arriba";
-        upBtn.addEventListener("click", () => {
+        if (index === 0) {
+            upBtn.disabled = true;
+        }
+        upBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            console.log(`Moviendo ${song.name} de posición ${index} a ${index - 1}`);
             if (index > 0) {
-                moveSong(song.name, index - 1);
+                const success = await moveSong(song.name, index - 1);
+                if (success) {
+                    console.log('Canción movida exitosamente');
+                }
             }
         });
         
@@ -213,9 +225,17 @@ function updatePlaylist() {
         downBtn.textContent = "↓";
         downBtn.classList.add("moveBtn");
         downBtn.title = "Mover abajo";
-        downBtn.addEventListener("click", () => {
+        if (index === songs.length - 1) {
+            downBtn.disabled = true;
+        }
+        downBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            console.log(`Moviendo ${song.name} de posición ${index} a ${index + 1}`);
             if (index < songs.length - 1) {
-                moveSong(song.name, index + 1);
+                const success = await moveSong(song.name, index + 1);
+                if (success) {
+                    console.log('Canción movida exitosamente');
+                }
             }
         });
         
@@ -226,14 +246,47 @@ function updatePlaylist() {
         posInput.max = songs.length;
         posInput.value = index + 1;
         posInput.classList.add("position-input");
-        posInput.title = "Ir a posición";
-        posInput.addEventListener("change", () => {
-            const newPos = parseInt(posInput.value) - 1;
-            if (newPos >= 0 && newPos < songs.length && newPos !== index) {
-                moveSong(song.name, newPos);
-            } else {
-                posInput.value = index + 1;
+        posInput.title = "Ir a posición (presiona Enter)";
+        
+        posInput.addEventListener("keypress", async (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const newPos = parseInt(posInput.value) - 1;
+                console.log(`Cambiando posición de ${song.name}: de ${index} a ${newPos}`);
+                
+                if (isNaN(newPos)) {
+                    alert('Por favor ingresa un número válido');
+                    posInput.value = index + 1;
+                    return;
+                }
+                
+                if (newPos < 0 || newPos >= songs.length) {
+                    alert(`La posición debe estar entre 1 y ${songs.length}`);
+                    posInput.value = index + 1;
+                    return;
+                }
+                
+                if (newPos !== index) {
+                    const success = await moveSong(song.name, newPos);
+                    if (success) {
+                        console.log('Canción movida exitosamente');
+                    } else {
+                        posInput.value = index + 1;
+                    }
+                } else {
+                    console.log('La canción ya está en esa posición');
+                }
             }
+        });
+        
+        posInput.addEventListener("blur", () => {
+            // Restaurar valor original si no se presionó Enter
+            posInput.value = index + 1;
+        });
+        
+        posInput.addEventListener("click", (e) => {
+            e.stopPropagation();
+            posInput.select();
         });
         
         // Botón play
@@ -241,7 +294,8 @@ function updatePlaylist() {
         playBtn.textContent = "▶";
         playBtn.classList.add("playBtn");
         playBtn.title = "Reproducir";
-        playBtn.addEventListener("click", () => {
+        playBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
             loadSong(index);
         });
         
@@ -250,7 +304,8 @@ function updatePlaylist() {
         deleteBtn.textContent = "❌";
         deleteBtn.classList.add("deleteBtn");
         deleteBtn.title = "Eliminar";
-        deleteBtn.addEventListener("click", () => {
+        deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
             if (confirm(`¿Eliminar "${song.name}"?`)) {
                 deleteSong(song.name);
             }
@@ -294,7 +349,7 @@ function handleDragOver(e) {
     return false;
 }
 
-function handleDrop(e) {
+async function handleDrop(e) {
     if (e.stopPropagation) {
         e.stopPropagation();
     }
@@ -304,7 +359,8 @@ function handleDrop(e) {
         const targetIndex = parseInt(this.dataset.index);
         const filename = draggedElement.dataset.filename;
         
-        moveSong(filename, targetIndex);
+        console.log(`Drag & Drop: Moviendo ${filename} de ${draggedIndex} a ${targetIndex}`);
+        await moveSong(filename, targetIndex);
     }
     
     this.style.borderTop = '';

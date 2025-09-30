@@ -19,6 +19,13 @@ app.config["MAX_CONTENT_LENGTH"] = 200 * 1024 * 1024  # 200 MB
 # --- Inicializar la playlist como lista doble ---
 playlist = DoublyLinkedList()
 
+# Cargar canciones existentes al iniciar
+def load_existing_songs():
+    files = [f for f in os.listdir(UPLOAD_FOLDER) if allowed_file(f)]
+    files.sort()
+    for file in files:
+        playlist.append(file)
+
 # --- Funciones auxiliares ---
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -32,9 +39,10 @@ def index():
 
 @app.route("/list")
 def list_files():
-    files = [f for f in os.listdir(app.config["UPLOAD_FOLDER"]) if allowed_file(f)]
-    files.sort()
-    return jsonify(files)
+    # Devolver las canciones en el orden de la lista doble
+    songs = playlist.get_all_songs()
+    print(f"[LIST] Canciones en orden: {songs}")
+    return jsonify(songs)
 
 
 @app.route("/upload", methods=["POST"])
@@ -49,6 +57,7 @@ def upload_file():
         save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
         file.save(save_path)
         playlist.append(filename)  # Agregar a la lista doble
+        print(f"[UPLOAD] Archivo subido: {filename}")
         return jsonify({"ok": True, "filename": filename})
     return jsonify({"error": "file not allowed"}), 400
 
@@ -64,6 +73,7 @@ def delete_file():
     if os.path.exists(target):
         os.remove(target)
         playlist.delete(safe)
+        print(f"[DELETE] Archivo eliminado: {safe}")
         return jsonify({"ok": True})
     return jsonify({"error": "file not found"}), 404
 
@@ -76,17 +86,23 @@ def uploaded_file(filename):
 # --- Rutas de control de playlist ---
 @app.route("/current")
 def current_song():
-    return jsonify({"current": playlist.get_current()})
+    current = playlist.get_current()
+    print(f"[CURRENT] Canción actual: {current}")
+    return jsonify({"current": current})
 
 
 @app.route("/next")
 def next_song():
-    return jsonify({"next": playlist.next_song()})
+    next_s = playlist.next_song()
+    print(f"[NEXT] Siguiente canción: {next_s}")
+    return jsonify({"next": next_s})
 
 
 @app.route("/prev")
 def prev_song():
-    return jsonify({"prev": playlist.prev_song()})
+    prev_s = playlist.prev_song()
+    print(f"[PREV] Canción anterior: {prev_s}")
+    return jsonify({"prev": prev_s})
 
 
 # --- NUEVA RUTA: Mover canción a una posición ---
@@ -96,21 +112,44 @@ def move_song():
     filename = data.get("filename")
     new_position = data.get("position")
     
+    print(f"[MOVE] Solicitud recibida: {filename} -> posición {new_position}")
+    
     if not filename or new_position is None:
+        print("[MOVE] Error: falta filename o position")
         return jsonify({"error": "missing filename or position"}), 400
+    
+    try:
+        new_position = int(new_position)
+    except ValueError:
+        print("[MOVE] Error: position no es un número válido")
+        return jsonify({"error": "position must be a number"}), 400
+    
+    # Verificar que la canción existe
+    all_songs = playlist.get_all_songs()
+    if filename not in all_songs:
+        print(f"[MOVE] Error: {filename} no existe en la playlist")
+        return jsonify({"error": "song not found in playlist"}), 404
     
     success = playlist.move_to_position(filename, new_position)
     
     if success:
-        return jsonify({"ok": True, "songs": playlist.get_all_songs()})
+        updated_songs = playlist.get_all_songs()
+        print(f"[MOVE] Éxito! Nuevo orden: {updated_songs}")
+        return jsonify({"ok": True, "songs": updated_songs})
+    
+    print("[MOVE] Error: no se pudo mover la canción")
     return jsonify({"error": "could not move song"}), 400
 
 
 # --- NUEVA RUTA: Obtener todas las canciones ---
 @app.route("/playlist")
 def get_playlist():
-    return jsonify({"songs": playlist.get_all_songs()})
+    songs = playlist.get_all_songs()
+    print(f"[PLAYLIST] Canciones actuales: {songs}")
+    return jsonify({"songs": songs})
 
 
 if __name__ == "__main__":
+    load_existing_songs()
+    print(f"[INICIO] Servidor iniciado. Canciones cargadas: {playlist.get_all_songs()}")
     app.run(debug=True, port=5000)
