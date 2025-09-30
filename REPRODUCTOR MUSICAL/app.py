@@ -89,5 +89,28 @@ def prev_song():
     return jsonify({"prev": playlist.prev_song()})
 
 
+# --- NUEVA RUTA: Mover canción a una posición ---
+@app.route("/move", methods=["POST"])
+def move_song():
+    data = request.json
+    filename = data.get("filename")
+    new_position = data.get("position")
+    
+    if not filename or new_position is None:
+        return jsonify({"error": "missing filename or position"}), 400
+    
+    success = playlist.move_to_position(filename, new_position)
+    
+    if success:
+        return jsonify({"ok": True, "songs": playlist.get_all_songs()})
+    return jsonify({"error": "could not move song"}), 400
+
+
+# --- NUEVA RUTA: Obtener todas las canciones ---
+@app.route("/playlist")
+def get_playlist():
+    return jsonify({"songs": playlist.get_all_songs()})
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

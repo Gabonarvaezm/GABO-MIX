@@ -121,11 +121,14 @@ outline: none;
 list-style-type: none;
 padding: 0;
 margin-top: 30px;
+max-width: 900px;
+margin-left: auto;
+margin-right: auto;
 }
 
 #playlist li {
 margin: 12px;
-padding: 10px;
+padding: 15px;
 background: rgba(255, 255, 255, 0.05);
 border-radius: 10px;
 display: flex;
@@ -134,6 +137,93 @@ align-items: center;
 font-weight: bold;
 letter-spacing: 1px;
 color: #f5f5f5;
+cursor: move;
+transition: all 0.3s ease;
+}
+
+#playlist li:hover {
+background: rgba(255, 255, 255, 0.1);
+box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+#playlist li.dragging {
+opacity: 0.4;
+}
+
+.song-name {
+flex: 1;
+text-align: left;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+margin-right: 15px;
+}
+
+/* Controles de canción */
+.song-controls {
+display: flex;
+gap: 8px;
+align-items: center;
+}
+
+/* Botones de mover */
+.moveBtn {
+background: linear-gradient(135deg, #3e3e3e, #555555);
+color: white;
+border: none;
+padding: 8px 12px;
+cursor: pointer;
+border-radius: 8px;
+font-weight: bold;
+font-size: 16px;
+transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.moveBtn:hover {
+background: linear-gradient(135deg, #d4af37, #c5b358);
+transform: scale(1.1);
+}
+
+.moveBtn:disabled {
+opacity: 0.3;
+cursor: not-allowed;
+}
+
+/* Input de posición */
+.position-input {
+width: 50px;
+padding: 6px;
+border: 2px solid #3e3e3e;
+border-radius: 6px;
+background: #1c1c1c;
+color: #f5f5f5;
+font-weight: bold;
+text-align: center;
+font-size: 14px;
+}
+
+.position-input:focus {
+outline: none;
+border-color: #d4af37;
+box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+/* Botón play */
+.playBtn {
+background: linear-gradient(135deg, #2c7a2c, #4caf50);
+color: white;
+border: none;
+padding: 8px 12px;
+cursor: pointer;
+border-radius: 8px;
+font-weight: bold;
+font-size: 16px;
+transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.playBtn:hover {
+background: linear-gradient(135deg, #4caf50, #66bb6a);
+transform: scale(1.1);
 }
 
 /* Botón eliminar */
@@ -141,7 +231,7 @@ color: #f5f5f5;
 background: linear-gradient(135deg, #6e0b0b, #b22222);
 color: white;
 border: none;
-padding: 12px 12px;
+padding: 8px 12px;
 cursor: pointer;
 border-radius: 8px;
 font-weight: bold;
@@ -150,5 +240,32 @@ transition: transform 0.2s ease, background 0.3s ease;
 
 .deleteBtn:hover {
 background: linear-gradient(135deg, #ff1a1a, #ff4d4d);
-transform: scale(1.05);
+transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+#playlist li {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.song-name {
+    text-align: center;
+    margin-right: 0;
+}
+
+.song-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+h1 {
+    font-size: 32px;
+}
+
+.controls button {
+    padding: 10px 14px;
+    font-size: 14px;
+}
 }

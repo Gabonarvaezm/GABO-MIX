@@ -9,7 +9,6 @@
 <body>
     <h1>GABO MIX </h1>
 
-
     <!-- Vinilo giratorio -->
     <div class="vinilo-container">
         <img src="{{ url_for('static', filename='vinilo.png') }}" alt="Vinilo" class="vinilo" id="vinilo">
@@ -28,13 +27,12 @@
 
     <!-- Subida de canciones -->
     <form id="uploadForm" enctype="multipart/form-data">
-    <input type="file" id="fileInput" name="file">
-    <label for="fileInput">SELECCIONAR ARCHIVO</label>
-    <button type="submit"> SUBIR</button>
-</form>
+        <input type="file" id="fileInput" name="file">
+        <label for="fileInput">SELECCIONAR ARCHIVO</label>
+        <button type="submit"> SUBIR</button>
+    </form>
 
-
-    <!-- Playlist -->
+    <!-- Playlist con controles de movimiento -->
     <h3>Playlist</h3>
     <ul id="playlist"></ul>
 
