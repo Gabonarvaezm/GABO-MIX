@@ -47,18 +47,18 @@ class DoublyLinkedList:
     def prev_song(self):
         if self.current and self.current.prev:
             self.current = self.current.prev
-            return self.current.data
+            return self.current.song
         return None
 
     def get_current(self):
-        return self.current.data if self.current else None
+        return self.current.song if self.current else None
 
-    def move_to_position(self, data, new_position):
+    def move_to_position(self, song, new_position):
         """Mover una canción a una nueva posición en la lista"""
         # Encontrar el nodo a mover
         node = self.head
         while node:
-            if node.data == data:
+            if node.song == song:
                 break
             node = node.next
         
