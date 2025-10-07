@@ -1,7 +1,7 @@
 # lista doble
-class Node:
-    def __init__(self, data):
-        self.data = data
+class music:
+    def __init__(self, song):
+        self.song = song
         self.prev = None
         self.next = None
 
@@ -11,7 +11,7 @@ class DoublyLinkedList:
         self.current = None
 
     def append(self, data):
-        new_node = Node(data)
+        new_node = music(data)
         if not self.head:
             self.head = new_node
             self.current = self.head
@@ -117,16 +117,16 @@ class DoublyLinkedList:
         songs = []
         node = self.head
         while node:
-            songs.append(node.data)
+            songs.append(node.song)
             node = node.next
         return songs
 
-    def get_position(self, data):
+    def get_position(self, song):
         """Obtener la posición de una canción"""
         node = self.head
         position = 0
         while node:
-            if node.data == data:
+            if node.song == song:
                 return position
             node = node.next
             position += 1
